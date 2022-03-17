@@ -1,0 +1,24 @@
+#cloud-config
+hostname: ${hostname}
+users:
+- name: ubuntu
+  passwd: $1$RKsfMeB4$gObnDlKqOslNr5fG04CXb1
+  ssh_authorized_keys: [${ssh_key}]
+  lock_passwd: false
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: /bin/bash
+runcmd: [netplan --debug apply]
+write_files:
+- path: /etc/netplan/50-cloud-init.yaml
+  content: |
+    network:
+      version: 2
+      ethernets:
+        ens192:
+          dhcp4: false
+          dhcp6: false
+          addresses: [${network_details.ip}/${network_details.subnet_mask}]
+          gateway4: ${network_details.gateway}
+          nameservers:
+            addresses: [10.100.2.13,10.100.2.14]
+            search: [ava.local, rumour.local]
